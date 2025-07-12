@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./CheckoutPage.css";
-import productImage from "./product-image.jpg"; 
+import productImage from "./product-image.jpg";
 
 export default function CheckoutPage() {
   const [formData, setFormData] = useState({
@@ -15,35 +15,95 @@ export default function CheckoutPage() {
     expiryDate: "",
     securityCode: "",
     coupon: "",
+    paymentMethod: "Thẻ tín dụng",
   });
 
   const [total, setTotal] = useState(140000);
+  const [hasCouponApplied, setHasCouponApplied] = useState(false);
+  const [couponMessage, setCouponMessage] = useState("");
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
 
-  const applyCoupon = () => {
-    if (formData.coupon === "DISCOUNT10") {
-      setTotal(total - 10000);
+    // Reset khi thay đổi mã giảm giá
+    if (name === "coupon") {
+      setHasCouponApplied(false);
+      setCouponMessage("");
+      setTotal(140000);
     }
   };
 
-  const handleSubmit = (e) => {
+  const applyCoupon = async () => {
+    if (hasCouponApplied) {
+      return setCouponMessage("⚠️ Mã đã được áp dụng!");
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/checkout/apply-coupon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coupon: formData.coupon }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setTotal(total - result.discount);
+        setHasCouponApplied(true);
+        setCouponMessage("✅ Mã giảm giá đã được áp dụng!");
+      } else {
+        setCouponMessage("❌ " + result.message);
+      }
+    } catch (error) {
+      console.error("Lỗi khi áp mã:", error);
+      setCouponMessage("❌ Đã có lỗi xảy ra khi áp dụng mã.");
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Thanh toán thành công!");
+
+    if (!formData.email || !formData.cardNumber) {
+      return alert("Vui lòng điền đầy đủ thông tin!");
+    }
+
+    const orderData = {
+      ...formData,
+      total: total,
+    };
+
+    try {
+      const response = await fetch("http://localhost:5000/api/checkout/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(result.message);
+      } else {
+        alert("Đặt hàng thất bại.");
+      }
+    } catch (error) {
+      console.error("Lỗi gửi đơn:", error);
+      alert("Đã có lỗi xảy ra khi đặt hàng.");
+    }
   };
 
   return (
     <div className="checkout-container">
       <form onSubmit={handleSubmit} className="checkout-form">
         <div className="section-header">
-            <h2 className="section-title">Kết Nối</h2>
-            <p className="text-sm">
-                Bạn đã có tài khoản chưa? <a href="#" className="link">Tạo tài khoản</a>
-            </p>
+          <h2 className="section-title">Kết Nối</h2>
+          <p className="text-sm">
+            Bạn đã có tài khoản chưa? <a href="/register" className="link">Tạo tài khoản</a>
+          </p>
         </div>
-        <div>
+
+        <div className="row">
           <input
             type="email"
             name="email"
@@ -86,11 +146,18 @@ export default function CheckoutPage() {
 
         <div>
           <h2 className="section-title">Thanh toán</h2>
-          <select className="input">
-            <option>Thẻ tín dụng</option>
+          <select
+            name="paymentMethod"
+            value={formData.paymentMethod}
+            onChange={handleChange}
+            className="input"
+          >
+            <option value="Thẻ tín dụng">Thẻ tín dụng</option>
+            <option value="Thẻ ghi nợ">Thẻ ghi nợ</option>
+            <option value="Chuyển khoản">Chuyển khoản</option>
           </select>
           <div className="row">
-             <input type="text" name="cardNumber" placeholder="Số thẻ" value={formData.cardNumber} onChange={handleChange} className="input" required />
+            <input type="text" name="cardNumber" placeholder="Số thẻ" value={formData.cardNumber} onChange={handleChange} className="input" required />
           </div>
           <div className="row">
             <input type="text" name="expiryDate" placeholder="Ngày hết hạn" value={formData.expiryDate} onChange={handleChange} className="input-half" required />
@@ -101,6 +168,7 @@ export default function CheckoutPage() {
             Lưu Thông Tin Này Để Sử Dụng Sau Này
           </label>
         </div>
+
         <button type="submit" className="submit-button">Thanh toán ngay</button>
       </form>
 
@@ -128,6 +196,10 @@ export default function CheckoutPage() {
           <button onClick={applyCoupon} type="button" className="apply-button">Áp dụng</button>
         </div>
 
+        {couponMessage && (
+          <div className="coupon-message">{couponMessage}</div>
+        )}
+
         <div className="price-breakdown">
           <div className="summary-item">
             <p>Tổng phụ</p>
@@ -138,7 +210,7 @@ export default function CheckoutPage() {
             <p>40.000 VND</p>
           </div>
           <div className="summary-total">
-            <p>Total</p>
+            <p>Tổng cộng</p>
             <p>{total.toLocaleString()} VND</p>
           </div>
         </div>

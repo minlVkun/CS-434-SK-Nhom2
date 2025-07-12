@@ -1,0 +1,190 @@
+.countdown {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 80px 0;
+}
+
+.countdown-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.countdown-left {
+  padding-right: 40px;
+}
+
+.countdown-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 20px 0;
+  line-height: 1.2;
+}
+
+.countdown-subtitle {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0 0 40px 0;
+}
+
+.countdown-timer {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.time-unit {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border: 2px solid #333;
+  min-width: 80px;
+}
+
+.time-number {
+  display: block;
+  font-size: 32px;
+  font-weight: 900;
+  color: #333;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.time-label {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.countdown-right {
+  display: flex;
+  justify-content: center;
+}
+
+.featured-products {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.product-item {
+  width: 120px;
+  height: 150px;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.product-image:hover {
+  transform: translateY(-5px);
+}
+
+.product-frame {
+  width: 90%;
+  height: 90%;
+  background: linear-gradient(45deg, #87CEEB, #98FB98);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.product-content {
+  font-size: 40px;
+  position: relative;
+}
+
+.product-sun {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 20px;
+}
+
+@media (max-width: 768px) {
+  .countdown {
+    padding: 60px 0;
+  }
+  
+  .countdown-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+  
+  .countdown-left {
+    padding-right: 0;
+  }
+  
+  .countdown-title {
+    font-size: 28px;
+  }
+  
+  .countdown-timer {
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .time-unit {
+    min-width: 70px;
+    padding: 15px;
+  }
+  
+  .time-number {
+    font-size: 24px;
+  }
+  
+  .featured-products {
+    gap: 10px;
+  }
+  
+  .product-item {
+    width: 100px;
+    height: 130px;
+  }
+  
+  .product-content {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .countdown-timer {
+    gap: 10px;
+  }
+  
+  .time-unit {
+    min-width: 60px;
+    padding: 10px;
+  }
+  
+  .time-number {
+    font-size: 20px;
+  }
+  
+  .time-label {
+    font-size: 10px;
+  }
+  
+  .featured-products {
+    flex-direction: column;
+    gap: 15px;
+  }
+}

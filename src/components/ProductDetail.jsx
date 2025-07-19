@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../App.css';
-//import EditProduct from './EditProduct';
 
-function ProductDetail({ productId, onBack }) {
+function ProductDetail({ productId, onBack, onAddToCart }) {
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [rating, setRating] = useState(0);
+  const [version, setVersion] = useState(2); // Phiên bản mặc định
 
   const fetchProduct = () => {
     axios.get(`http://localhost:5000/api/products`)
@@ -24,6 +24,18 @@ function ProductDetail({ productId, onBack }) {
 
   const handleQuantityChange = (amount) => {
     setQuantity((prev) => Math.max(1, prev + amount));
+  };
+
+  const handleAddToCart = () => {
+    if (product) {
+      const cartItem = {
+        ...product,
+        quantity,
+        version,
+        totalPrice: product.price * quantity
+      };
+      onAddToCart(cartItem); // ✅ Gọi callback để chuyển sang trang xác nhận
+    }
   };
 
   if (!product) return <p>Loading...</p>;
@@ -75,7 +87,18 @@ function ProductDetail({ productId, onBack }) {
         <div className="variant-section">
           <label>Phiên bản:</label>
           <div className="variant-buttons">
-            <button className="variant selected">{product.variant}</button>
+            <button 
+              className={`variant ${version === 1 ? 'selected' : ''}`}
+              onClick={() => setVersion(1)}
+            >
+              1
+            </button>
+            <button 
+              className={`variant ${version === 2 ? 'selected' : ''}`}
+              onClick={() => setVersion(2)}
+            >
+              2
+            </button>
           </div>
         </div>
 
@@ -88,17 +111,9 @@ function ProductDetail({ productId, onBack }) {
           </div>
         </div>
 
-        <button className="add-to-cart">Thêm vào giỏ hàng</button>
+        <button className="add-to-cart" onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
         <p className="shipping">🚚 Giao hàng trong: 25 tháng 7 - 1 tháng 8</p>
         <p className="promo">🎁 Giảm giá và miễn phí vận chuyển: cho đơn hàng hơn 100,000đ</p>
-
-        {/* CHỨC NĂNG CHỈNH SỬA GIÁ
-        <EditProduct
-          product={product}
-          onUpdated={() => fetchProduct()}
-        />
-        */}
-
       </div>
     </div>
   );
